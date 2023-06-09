@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>service-acl</module>
+        <module>service-sys</module>
     </modules>
 
     <properties>
