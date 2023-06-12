@@ -1,8 +1,8 @@
-package cn.itedus.ssyx.controller;
+package cn.itedus.ssyx.sys.controller;
 
 import cn.itedus.ssyx.common.result.Result;
 import cn.itedus.ssyx.model.sys.RegionWare;
-import cn.itedus.ssyx.service.RegionWareService;
+import cn.itedus.ssyx.sys.service.RegionWareService;
 import cn.itedus.ssyx.vo.sys.RegionWareQueryVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

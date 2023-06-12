@@ -1,7 +1,7 @@
-package cn.itedus.ssyx.controller;
+package cn.itedus.ssyx.sys.controller;
 
 import cn.itedus.ssyx.common.result.Result;
-import cn.itedus.ssyx.service.WareService;
+import cn.itedus.ssyx.sys.service.WareService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

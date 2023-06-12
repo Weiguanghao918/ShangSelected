@@ -1,8 +1,8 @@
-package cn.itedus.ssyx.service.impl;
+package cn.itedus.ssyx.sys.service.impl;
 
-import cn.itedus.ssyx.mapper.RegionMapper;
+import cn.itedus.ssyx.sys.mapper.RegionMapper;
 import cn.itedus.ssyx.model.sys.Region;
-import cn.itedus.ssyx.service.RegionService;
+import cn.itedus.ssyx.sys.service.RegionService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

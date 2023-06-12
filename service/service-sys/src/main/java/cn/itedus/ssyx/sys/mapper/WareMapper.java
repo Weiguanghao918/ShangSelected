@@ -1,4 +1,4 @@
-package cn.itedus.ssyx.mapper;
+package cn.itedus.ssyx.sys.mapper;
 
 import cn.itedus.ssyx.model.sys.Region;
 import cn.itedus.ssyx.model.sys.Ware;

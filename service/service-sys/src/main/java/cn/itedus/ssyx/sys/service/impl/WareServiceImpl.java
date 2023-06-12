@@ -1,8 +1,8 @@
-package cn.itedus.ssyx.service.impl;
+package cn.itedus.ssyx.sys.service.impl;
 
-import cn.itedus.ssyx.mapper.WareMapper;
+import cn.itedus.ssyx.sys.mapper.WareMapper;
 import cn.itedus.ssyx.model.sys.Ware;
-import cn.itedus.ssyx.service.WareService;
+import cn.itedus.ssyx.sys.service.WareService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 

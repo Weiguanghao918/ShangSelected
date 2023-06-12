@@ -1,4 +1,4 @@
-package cn.itedus.ssyx.service;
+package cn.itedus.ssyx.sys.service;
 
 import cn.itedus.ssyx.model.sys.RegionWare;
 import cn.itedus.ssyx.vo.sys.RegionWareQueryVo;

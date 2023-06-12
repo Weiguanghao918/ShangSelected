@@ -1,10 +1,10 @@
-package cn.itedus.ssyx.service.impl;
+package cn.itedus.ssyx.sys.service.impl;
 
 import cn.itedus.ssyx.common.exception.SsyxException;
 import cn.itedus.ssyx.common.result.ResultCodeEnum;
-import cn.itedus.ssyx.mapper.RegionWareMapper;
+import cn.itedus.ssyx.sys.mapper.RegionWareMapper;
 import cn.itedus.ssyx.model.sys.RegionWare;
-import cn.itedus.ssyx.service.RegionWareService;
+import cn.itedus.ssyx.sys.service.RegionWareService;
 import cn.itedus.ssyx.vo.sys.RegionWareQueryVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
