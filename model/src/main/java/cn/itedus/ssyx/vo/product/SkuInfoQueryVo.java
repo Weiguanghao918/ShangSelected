@@ -13,7 +13,7 @@ public class SkuInfoQueryVo {
 	@ApiModelProperty(value = "商品类型：0->普通商品 1->秒杀商品")
 	private String skuType;
 
-	@ApiModelProperty(value = "spu名称")
+	@ApiModelProperty(value = "sku名称")
 	private String keyword;
 
 }

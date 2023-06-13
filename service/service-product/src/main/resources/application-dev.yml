@@ -16,3 +16,14 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+
+aliyun:
+  endpoint: oss-cn-beijing.aliyuncs.com
+  keyid: kOYsekihDnjXSW0cJFR1yHFyg9Owwu77kLdEfYkLdQE=
+  keysecret: vDt0Yz9pTJdYsbae9JOivbSCbyhJ3kt5Sl8iwwbbOtA=
+  bucketname: ssyx-itedus0613
+
+jasypt:
+  encryptor:
+    password: ADUMDFUOV7834*
+
