@@ -23,7 +23,5 @@ aliyun:
   keysecret: vDt0Yz9pTJdYsbae9JOivbSCbyhJ3kt5Sl8iwwbbOtA=
   bucketname: ssyx-itedus0613
 
-jasypt:
-  encryptor:
-    password: ADUMDFUOV7834*
+
 
