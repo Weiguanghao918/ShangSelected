@@ -4,6 +4,8 @@ import cn.itedus.ssyx.model.product.SkuAttrValue;
 import cn.itedus.ssyx.model.product.SkuImage;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.model.product.SkuPoster;
+import cn.itedus.ssyx.mq.constant.MqConst;
+import cn.itedus.ssyx.mq.service.RabbitService;
 import cn.itedus.ssyx.product.mapper.SkuInfoMapper;
 import cn.itedus.ssyx.product.service.SkuAttrValueService;
 import cn.itedus.ssyx.product.service.SkuImageService;
@@ -42,6 +44,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Autowired
     private SkuAttrValueService skuAttrValueService;
+
+    @Autowired
+    private RabbitService rabbitService;
 
     @Override
     public IPage<SkuInfo> selectPageInfo(Page<SkuInfo> pageParam, SkuInfoQueryVo skuInfoQueryVo) {
@@ -183,13 +188,15 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             skuInfo.setId(skuId);
             skuInfo.setPublishStatus(1);
             skuInfoMapper.updateById(skuInfo);
-            //TODO：商品上架，后续会完善-->发送mq消息更新es数据
+            //商品上架：发送mq消息同步ES
+            rabbitService.sendMessage(MqConst.EXCHANGE_GOODS_DIRECT, MqConst.ROUTING_GOODS_UPPER, skuId);
         } else {
             SkuInfo skuInfo = new SkuInfo();
             skuInfo.setId(skuId);
             skuInfo.setPublishStatus(0);
             skuInfoMapper.updateById(skuInfo);
-            //TODO：商品下架，后续会完善-->发送mq消息更新es数据
+            //商品下架：发送mq消息同步ES
+            rabbitService.sendMessage(MqConst.EXCHANGE_GOODS_DIRECT, MqConst.ROUTING_GOODS_LOWER, skuId);
         }
     }
 
@@ -199,5 +206,31 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         skuInfo.setId(skuId);
         skuInfo.setIsNewPerson(status);
         skuInfoMapper.updateById(skuInfo);
+    }
+
+    @Override
+    public void removeBySKuId(Long skuId) {
+        //首先删除SkuInfo表中的数据
+        skuInfoMapper.deleteById(skuId);
+        //删除图片、海报和属性
+        skuImageService.remove(new LambdaQueryWrapper<SkuImage>().eq(SkuImage::getSkuId, skuId));
+        skuPosterService.remove(new LambdaQueryWrapper<SkuPoster>().eq(SkuPoster::getSkuId, skuId));
+        skuAttrValueService.remove(new LambdaQueryWrapper<SkuAttrValue>().eq(SkuAttrValue::getSkuId, skuId));
+        //发送MQ消息，同步删除ES中的内容，其实就是和下架一样的
+        rabbitService.sendMessage(MqConst.EXCHANGE_GOODS_DIRECT, MqConst.ROUTING_GOODS_LOWER, skuId);
+    }
+
+    @Override
+    public void batchRemoveBySKuIds(List<Long> idList) {
+        for (long skuId : idList) {
+            //首先删除SkuInfo表中的数据
+            skuInfoMapper.deleteById(skuId);
+            //删除图片、海报和属性
+            skuImageService.remove(new LambdaQueryWrapper<SkuImage>().eq(SkuImage::getSkuId, skuId));
+            skuPosterService.remove(new LambdaQueryWrapper<SkuPoster>().eq(SkuPoster::getSkuId, skuId));
+            skuAttrValueService.remove(new LambdaQueryWrapper<SkuAttrValue>().eq(SkuAttrValue::getSkuId, skuId));
+            //发送MQ消息，同步删除ES中的内容，其实就是和下架一样的
+            rabbitService.sendMessage(MqConst.EXCHANGE_GOODS_DIRECT, MqConst.ROUTING_GOODS_LOWER, skuId);
+        }
     }
 }

@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @author: Guanghao Wei
  * @date: 2023-06-13 14:43
@@ -63,4 +65,16 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @param status 新人专享状态
      */
     void isNerPerson(Long skuId, Integer status);
+
+    /**
+     * 删除商品Sku消息
+     * @param skuId SKu id
+     */
+    void removeBySKuId(Long skuId);
+
+    /**
+     * 批量删除Sku商品
+     * @param idList Sku商品Id集合
+     */
+    void batchRemoveBySKuIds(List<Long> idList);
 }

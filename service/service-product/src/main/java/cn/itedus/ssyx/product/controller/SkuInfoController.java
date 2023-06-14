@@ -60,15 +60,15 @@ public class SkuInfoController {
 
     @ApiOperation("删除商品SKu信息")
     @DeleteMapping("remove/{id}")
-    public Result remove(@PathVariable("id") Long id) {
-        skuInfoService.removeById(id);
+    public Result remove(@PathVariable("id") Long skuId) {
+        skuInfoService.removeBySKuId(skuId);
         return Result.ok();
     }
 
     @ApiOperation("批量删除Sku信息")
     @DeleteMapping("batchRemove")
     public Result batchRemoveByIds(@RequestBody List<Long> idList) {
-        skuInfoService.removeByIds(idList);
+        skuInfoService.batchRemoveBySKuIds(idList);
         return Result.ok();
     }
 

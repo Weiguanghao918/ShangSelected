@@ -4,3 +4,8 @@ spring:
 
   profiles:
     active: dev
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8850
