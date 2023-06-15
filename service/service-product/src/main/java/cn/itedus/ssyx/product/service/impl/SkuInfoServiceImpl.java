@@ -233,4 +233,18 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             rabbitService.sendMessage(MqConst.EXCHANGE_GOODS_DIRECT, MqConst.ROUTING_GOODS_LOWER, skuId);
         }
     }
+
+    @Override
+    public List<SkuInfo> findSkuInfoList(List<Long> idList) {
+        List<SkuInfo> skuInfoList = skuInfoMapper.selectBatchIds(idList);
+        return skuInfoList;
+    }
+
+    @Override
+    public List<SkuInfo> findSkuInfoListByKeyword(String keyword) {
+        LambdaQueryWrapper<SkuInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.like(SkuInfo::getSkuName, keyword);
+        List<SkuInfo> skuInfoList = skuInfoMapper.selectList(lambdaQueryWrapper);
+        return skuInfoList;
+    }
 }

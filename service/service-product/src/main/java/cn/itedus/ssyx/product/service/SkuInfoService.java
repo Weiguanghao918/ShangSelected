@@ -41,40 +41,62 @@ public interface SkuInfoService extends IService<SkuInfo> {
 
     /**
      * 修改商品Sku信息
+     *
      * @param skuInfoVo 商品Skuvo类
      */
     void updateSkuInfoById(SkuInfoVo skuInfoVo);
 
     /**
      * 商品Sku状态审核
-     * @param skuId Sku id
+     *
+     * @param skuId  Sku id
      * @param status 当前状态码
      */
     void checkStatus(Long skuId, Integer status);
 
     /**
      * 商品上架功能
-     * @param skuId 商品Sku id
+     *
+     * @param skuId  商品Sku id
      * @param status 当前上架状态
      */
     void publishSku(Long skuId, Integer status);
 
     /**
      * 修改是否新人专享状态
-     * @param skuId 商品SKu id
+     *
+     * @param skuId  商品SKu id
      * @param status 新人专享状态
      */
     void isNerPerson(Long skuId, Integer status);
 
     /**
      * 删除商品Sku消息
+     *
      * @param skuId SKu id
      */
     void removeBySKuId(Long skuId);
 
     /**
      * 批量删除Sku商品
+     *
      * @param idList Sku商品Id集合
      */
     void batchRemoveBySKuIds(List<Long> idList);
+
+    /**
+     * 根据id列表获取Sku集合
+     *
+     * @param idList SKu id集合
+     * @return Sku集合
+     */
+    List<SkuInfo> findSkuInfoList(List<Long> idList);
+
+    /**
+     * 根据关键字获取Sku集合
+     *
+     * @param keyword 关键字
+     * @return Sku集合
+     */
+    List<SkuInfo> findSkuInfoListByKeyword(String keyword);
 }

@@ -7,10 +7,9 @@ import cn.itedus.ssyx.product.service.SkuInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author: Guanghao Wei
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "商品上下架操作ES接口")
 @RestController
 @RequestMapping("/api/product")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class ProductInnerController {
     @Autowired
     private CategoryService categoryService;
@@ -33,11 +33,25 @@ public class ProductInnerController {
         return category;
     }
 
-    @ApiOperation("很具SkuId获取Sku信息")
+    @ApiOperation("根据SkuId获取Sku信息")
     @GetMapping("inner/getSkuInfo/{skuId}")
     public SkuInfo getSkuInfo(@PathVariable("skuId") Long skuId) {
         SkuInfo skuInfo = skuInfoService.getById(skuId);
         return skuInfo;
+    }
+
+    @ApiOperation("批量获取Sku信息")
+    @PostMapping("inner/findSkuInfoList")
+    public List<SkuInfo> findSkuInfoList(@RequestBody List<Long> idList) {
+        List<SkuInfo> skuInfoList = skuInfoService.findSkuInfoList(idList);
+        return skuInfoList;
+    }
+
+    @ApiOperation("根据关键字获取Sku列表")
+    @PostMapping("inner/findSkuInfoByKeyword/{keyword}")
+    public List<SkuInfo> findSkuInfoListByKeyword(@PathVariable("keyword") String keyword) {
+        List<SkuInfo> skuInfoList = skuInfoService.findSkuInfoListByKeyword(keyword);
+        return skuInfoList;
     }
 
 }

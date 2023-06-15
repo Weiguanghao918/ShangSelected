@@ -1,0 +1,26 @@
+server:
+  port: 8204
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-enums-package: cn.itedus.ssyx.enums
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shequ-activity?characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 980918
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  feign:
+    sentinel:
+      enabled: true
+    client:
+      config:
+        default: #配置全局的feign的调用超时时间  如果 有指定的服务配置 默认的配置不会生效
+          connectTimeout: 30000 # 指定的是 消费者 连接服务提供者的连接超时时间 是否能连接  单位是毫秒
+          readTimeout: 50000  # 指定的是调用服务提供者的 服务 的超时时间（）  单位是毫秒
