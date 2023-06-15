@@ -54,4 +54,11 @@ public class ProductInnerController {
         return skuInfoList;
     }
 
+    @ApiOperation("根据Id列表获取分类集合")
+    @PostMapping("inner/findCategoryList")
+    public List<Category> findCategoryList(@RequestBody List<Long> idList) {
+        List<Category> categoryList=categoryService.findCategoryList(idList);
+        return categoryList;
+    }
+
 }

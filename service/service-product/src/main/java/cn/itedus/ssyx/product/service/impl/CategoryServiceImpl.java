@@ -41,4 +41,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         List<Category> categoryList = categoryMapper.selectList(lambdaQueryWrapper);
         return categoryList;
     }
+
+    @Override
+    public List<Category> findCategoryList(List<Long> idList) {
+        List<Category> categoryList = categoryMapper.selectBatchIds(idList);
+        return categoryList;
+    }
 }

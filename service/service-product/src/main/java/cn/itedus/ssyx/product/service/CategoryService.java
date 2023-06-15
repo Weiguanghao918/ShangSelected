@@ -29,4 +29,12 @@ public interface CategoryService extends IService<Category> {
      * @return 商品分类信息列表
      */
     List<Category> findAllList();
+
+    /**
+     * 根据Id列表获取分类集合
+     *
+     * @param idList Id列表
+     * @return 分类集合
+     */
+    List<Category> findCategoryList(List<Long> idList);
 }
