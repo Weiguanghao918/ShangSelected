@@ -1,5 +1,5 @@
 server:
-  port: 8204
+  port: 8205
 
 mybatis-plus:
   configuration:

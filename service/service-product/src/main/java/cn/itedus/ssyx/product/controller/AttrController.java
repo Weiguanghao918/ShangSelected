@@ -18,7 +18,6 @@ import java.util.List;
 @Api(tags = "平台属性管理")
 @RestController
 @RequestMapping("/admin/product/attr")
-@CrossOrigin
 public class AttrController {
     @Autowired
     private AttrService attrService;

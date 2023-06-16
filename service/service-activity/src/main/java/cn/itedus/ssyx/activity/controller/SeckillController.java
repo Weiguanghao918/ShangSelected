@@ -21,7 +21,6 @@ import java.util.List;
 @Api(tags = "秒杀活动管理控制器")
 @RestController
 @RequestMapping("/admin/activity/seckill")
-@CrossOrigin
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class SeckillController {
     @Autowired

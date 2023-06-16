@@ -1,10 +1,8 @@
 spring:
   application:
-    name: service-acl
-
+    name: service-gateway
   profiles:
     active: dev
-
   cloud:
     nacos:
       discovery:

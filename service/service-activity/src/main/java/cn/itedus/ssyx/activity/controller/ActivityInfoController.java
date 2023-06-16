@@ -25,7 +25,6 @@ import java.util.Objects;
 @Api(tags = "营销活动控制器")
 @RestController
 @RequestMapping("/admin/activity/activityInfo")
-@CrossOrigin
 public class ActivityInfoController {
     @Autowired
     private ActivityInfoService activityInfoService;

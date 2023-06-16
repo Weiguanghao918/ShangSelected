@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/admin/sys/regionWare")
 @SuppressWarnings({"unchecked", "rawtypes"})
-@CrossOrigin
 public class RegionWareController {
     @Autowired
     private RegionWareService regionWareService;

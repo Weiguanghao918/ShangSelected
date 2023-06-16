@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "区域接口")
 @RestController
 @RequestMapping("/admin/sys/region")
-@CrossOrigin
 public class RegionController {
     @Autowired
     private RegionService regionService;

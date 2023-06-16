@@ -13,7 +13,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/admin/acl/index")
-@CrossOrigin     //跨域
 public class IndexController {
 
     /**
