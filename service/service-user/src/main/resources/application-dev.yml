@@ -1,0 +1,37 @@
+server:
+  port: 8206
+
+mybatis-plus:
+  type-enums-package: cn.itedus.ssyx.enums
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shequ-user?characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 980918
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  redis:
+    host: 192.168.10.101
+    port: 6379
+    database: 0
+    timeout: 1800000
+    password: 111111
+    lettuce:
+      pool:
+        max-active: 20 #最大连接数
+        max-wait: -1    #最大阻塞等待时间(负数表示没限制)
+        max-idle: 5    #最大空闲
+        min-idle: 0     #最小空闲
+
+wx:
+  open:
+    app_id: wx26a5c9b811b213fa
+    app_secret: e0b9cb46754d308a2f5585532e582dd7

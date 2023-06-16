@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: service-user
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8850
+  profiles:
+    active: dev
