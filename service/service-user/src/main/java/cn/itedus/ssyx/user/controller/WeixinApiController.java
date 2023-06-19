@@ -4,6 +4,7 @@ import cn.itedus.ssyx.common.constant.RedisConst;
 import cn.itedus.ssyx.common.exception.SsyxException;
 import cn.itedus.ssyx.common.result.Result;
 import cn.itedus.ssyx.common.result.ResultCodeEnum;
+import cn.itedus.ssyx.common.auth.AuthContextHolder;
 import cn.itedus.ssyx.common.utils.JwtHelper;
 import cn.itedus.ssyx.enums.UserType;
 import cn.itedus.ssyx.model.user.User;
@@ -105,6 +106,17 @@ public class WeixinApiController {
 
         return Result.ok(map);
 
+    }
+
+    @ApiOperation("更新用户昵称与头像")
+    @PostMapping("/auth/updateUser")
+    public Result updateUser(@RequestBody User user) {
+        User user1 = userService.getById(AuthContextHolder.getUserId());
+        //把昵称更新为微信用户
+        user1.setNickName(user.getNickName().replaceAll("[ue000-uefff]", "*"));
+        user1.setPhotoUrl(user.getPhotoUrl());
+        userService.updateById(user1);
+        return Result.ok(null);
     }
 
 

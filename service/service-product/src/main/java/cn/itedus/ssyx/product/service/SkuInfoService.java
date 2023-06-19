@@ -99,4 +99,10 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @return Sku集合
      */
     List<SkuInfo> findSkuInfoListByKeyword(String keyword);
+
+    /**
+     * 获取新人专享商品
+     * @return 新人专享Sku列表
+     */
+    List<SkuInfo> findNewPersonSkuInfoList();
 }

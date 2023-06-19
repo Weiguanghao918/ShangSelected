@@ -9,9 +9,13 @@ import cn.itedus.ssyx.search.repository.SkuRepository;
 import cn.itedus.ssyx.search.service.SkuService;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author: Guanghao Wei
@@ -25,8 +29,7 @@ public class SkuServiceImpl implements SkuService {
     private ProductFeignClient productFeignClient;
     @Autowired
     private SkuRepository skuRepository;
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
+
 
 
     @Override
@@ -67,5 +70,13 @@ public class SkuServiceImpl implements SkuService {
     @Override
     public void lowerSku(Long skuId) {
         this.skuRepository.deleteById(skuId);
+    }
+
+    @Override
+    public List<SkuEs> findHotSkuList() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<SkuEs> pageModel = skuRepository.findByOrderByHotScoreDesc(pageable);
+        List<SkuEs> skuEsList = pageModel.getContent();
+        return skuEsList;
     }
 }

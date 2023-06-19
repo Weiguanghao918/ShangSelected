@@ -57,8 +57,22 @@ public class ProductInnerController {
     @ApiOperation("根据Id列表获取分类集合")
     @PostMapping("inner/findCategoryList")
     public List<Category> findCategoryList(@RequestBody List<Long> idList) {
-        List<Category> categoryList=categoryService.findCategoryList(idList);
+        List<Category> categoryList = categoryService.findCategoryList(idList);
         return categoryList;
+    }
+
+    @ApiOperation("获取全部分类信息")
+    @GetMapping("inner/findAllCategoryList")
+    public List<Category> findAllCategoryList() {
+        List<Category> categoryList = categoryService.findAllList();
+        return categoryList;
+    }
+
+    @ApiOperation("获取新人专享商品")
+    @GetMapping("inner/findNewPersonSkuInfoList")
+    public List<SkuInfo> findNewPersonSkuInfoList() {
+        List<SkuInfo> skuInfoList = skuInfoService.findNewPersonSkuInfoList();
+        return skuInfoList;
     }
 
 }
