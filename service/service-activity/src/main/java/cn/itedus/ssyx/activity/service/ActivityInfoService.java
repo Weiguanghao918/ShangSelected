@@ -55,4 +55,12 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      * @return 促销规则集合
      */
     List<ActivityRule> findActivityRule(Long skuId);
+
+    /**
+     * 根据sku Id列表获取对应的规则信息
+     *
+     * @param skuIdList sku商品Id列表
+     * @return 封装后的map集合，其中，SkuId为键，促销活动描述为值
+     */
+    Map<Long, List<String>> findActivity(List<Long> skuIdList);
 }

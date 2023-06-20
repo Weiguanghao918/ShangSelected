@@ -2,6 +2,9 @@ package cn.itedus.ssyx.search.service;
 
 
 import cn.itedus.ssyx.model.search.SkuEs;
+import cn.itedus.ssyx.vo.search.SkuEsQueryVo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -32,4 +35,13 @@ public interface SkuService {
      * @return 爆款商品列表
      */
     List<SkuEs> findHotSkuList();
+
+    /**
+     * 搜索列表
+     *
+     * @param pageable     分页信息
+     * @param skuEsQueryVo 查询条件
+     * @return 商品分裂信息
+     */
+    Page<SkuEs> search(Pageable pageable, SkuEsQueryVo skuEsQueryVo);
 }

@@ -6,6 +6,7 @@
     <resultMap id="ActivityRuleMap" type="cn.itedus.ssyx.model.activity.ActivityRule" autoMapping="true">
     </resultMap>
 
+
     <select id="selecExistIdList" resultType="Long">
         select
         sku.sku_id
@@ -23,16 +24,19 @@
     </select>
 
     <select id="selectActivityRuleList" resultMap="ActivityRuleMap">
-        select
-            info.activity_type as activityType,
-            rule.id,rule.activity_id,rule.condition_amount,rule.condition_num,rule.benefit_amount,rule.benefit_discount
+        select info.activity_type as activityType,
+               rule.id,
+               rule.activity_id,
+               rule.condition_amount,
+               rule.condition_num,
+               rule.benefit_amount,
+               rule.benefit_discount
         from activity_info info
                  inner join activity_sku sku on sku.activity_id = info.id
                  inner join activity_rule rule on rule.activity_id = info.id
-        where
-            sku.sku_id = #{skuId}
+        where sku.sku_id = #{skuId}
           and now() between info.start_time and info.end_time
+          and sku.is_deleted = 0 and rule.is_deleted = 0 and info.is_deleted = 0
         order by rule.condition_amount desc, rule.condition_num desc
     </select>
-
 </mapper>

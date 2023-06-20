@@ -46,6 +46,7 @@ public class ActivityInfoController {
         return Result.ok(activityInfo);
     }
 
+
     @ApiOperation(value = "修改活动")
     @PutMapping("update")
     public Result updateById(@RequestBody ActivityInfo activityInfo) {

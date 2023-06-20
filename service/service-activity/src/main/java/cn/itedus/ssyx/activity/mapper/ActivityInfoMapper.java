@@ -19,4 +19,5 @@ public interface ActivityInfoMapper extends BaseMapper<ActivityInfo> {
     List<Long> selecExistIdList(@Param("skuIdList") List<Long> skuIdList);
 
     List<ActivityRule> selectActivityRuleList(@Param("skuId") Long skuId);
+
 }
