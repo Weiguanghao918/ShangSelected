@@ -2,6 +2,7 @@ package cn.itedus.ssyx.client.product;
 
 import cn.itedus.ssyx.model.product.Category;
 import cn.itedus.ssyx.model.product.SkuInfo;
+import cn.itedus.ssyx.vo.product.SkuInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,4 +78,13 @@ public interface ProductFeignClient {
      */
     @GetMapping("/api/product/inner/findNewPersonSkuInfoList")
     public List<SkuInfo> findNewPersonSkuInfoList();
+
+    /**
+     * 获取商品SkuInfoVo封装结果
+     *
+     * @param skuId skuId
+     * @return 封装结果
+     */
+    @GetMapping("/api/product/inner/{id}")
+    public SkuInfoVo getSkuInfoById(@PathVariable("id") Long skuId);
 }

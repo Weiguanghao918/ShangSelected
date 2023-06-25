@@ -44,4 +44,10 @@ public interface SkuService {
      * @return 商品分裂信息
      */
     Page<SkuEs> search(Pageable pageable, SkuEsQueryVo skuEsQueryVo);
+
+    /**
+     * 增加商品热度
+     * @param skuId skuId
+     */
+    void incrHtScore(Long skuId);
 }

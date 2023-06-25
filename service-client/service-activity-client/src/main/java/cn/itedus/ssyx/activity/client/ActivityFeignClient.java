@@ -1,6 +1,8 @@
 package cn.itedus.ssyx.activity.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -22,4 +24,16 @@ public interface ActivityFeignClient {
      */
     @PostMapping("/api/activity/inner/findActivity")
     public Map<Long, List<String>> findActivity(@RequestBody List<Long> skuIdList);
+
+    /**
+     * 根据skuId和userId获取活动与优惠券信息
+     *
+     * @param skuId  skuId
+     * @param userId userId
+     * @return 结果map
+     */
+    @GetMapping("/api/activity/inner/findActivityAndCoupon/{skuId}/{userId}")
+    public Map<String, Object> findActivityAndCoupon(@PathVariable("skuId") Long skuId,
+                                                     @PathVariable("userId") Long userId);
+
 }

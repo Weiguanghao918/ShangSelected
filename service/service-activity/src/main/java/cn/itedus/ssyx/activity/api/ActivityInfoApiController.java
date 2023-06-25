@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author: Guanghao Wei
@@ -27,4 +28,13 @@ public class ActivityInfoApiController {
         Map<Long, List<String>> map = activityInfoService.findActivity(skuIdList);
         return map;
     }
+
+    @ApiOperation("根据SkuId获取促销与优惠券信息")
+    @GetMapping("inner/findActivityAndCoupon/{skuId}/{userId}")
+    public Map<String, Object> findActivityAndCoupon(@PathVariable("skuId") Long skuId,
+                                                     @PathVariable("userId") Long userId) {
+        Map<String, Object> map = activityInfoService.findActivityAndCoupon(skuId, userId);
+        return map;
+    }
+
 }

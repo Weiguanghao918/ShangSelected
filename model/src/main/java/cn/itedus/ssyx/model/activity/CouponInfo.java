@@ -48,7 +48,7 @@ public class CouponInfo extends BaseEntity {
 	@TableField("end_time")
 	private Date endTime;
 
-	@ApiModelProperty(value = "使用范围[0->全场通用；1->指定分类；2->指定商品]")
+	@ApiModelProperty(value = "使用范围[1->全场通用；2->指定商品; 3->指定分类]")
 	@TableField("range_type")
 	private CouponRangeType rangeType;
 

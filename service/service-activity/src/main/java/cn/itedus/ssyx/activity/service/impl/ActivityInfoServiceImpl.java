@@ -3,12 +3,15 @@ package cn.itedus.ssyx.activity.service.impl;
 import cn.itedus.ssyx.activity.mapper.ActivityInfoMapper;
 import cn.itedus.ssyx.activity.mapper.ActivityRuleMapper;
 import cn.itedus.ssyx.activity.mapper.ActivitySkuMapper;
+import cn.itedus.ssyx.activity.mapper.CouponInfoMapper;
 import cn.itedus.ssyx.activity.service.ActivityInfoService;
+import cn.itedus.ssyx.activity.service.CouponInfoService;
 import cn.itedus.ssyx.client.product.ProductFeignClient;
 import cn.itedus.ssyx.enums.ActivityType;
 import cn.itedus.ssyx.model.activity.ActivityInfo;
 import cn.itedus.ssyx.model.activity.ActivityRule;
 import cn.itedus.ssyx.model.activity.ActivitySku;
+import cn.itedus.ssyx.model.activity.CouponInfo;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.activity.ActivityRuleVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -39,7 +42,25 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     private ActivitySkuMapper activitySkuMapper;
     @Autowired
     private ProductFeignClient productFeignClient;
+    @Autowired
+    private CouponInfoService couponInfoService;
 
+
+    @Override
+    public Map<String, Object> findActivityAndCoupon(Long skuId, Long userId) {
+        //1. 封装活动信息，一个sku只能参加一个活动，但是一个活动可以有多个规则，获取规则集合即可
+        List<ActivityRule> activityRuleList = this.findActivityRule(skuId);
+
+        //2. 获取优惠券信息
+        List<CouponInfo> couponInfoList = couponInfoService.findCouponInfo(skuId, userId);
+
+        //3. 封装结果
+        Map<String, Object> result = new HashMap<>();
+        result.put("activityRuleList", activityRuleList);
+        result.put("couponInfoList", couponInfoList);
+        return result;
+
+    }
 
     @Override
     public IPage<ActivityInfo> selectPage(Page<ActivityInfo> pageParam) {
@@ -139,17 +160,18 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
             List<ActivityRule> activityRuleList =
                     baseMapper.selectActivityRuleList(skuId);
             //数据封装，规则名称
-            if(!CollectionUtils.isEmpty(activityRuleList)) {
+            if (!CollectionUtils.isEmpty(activityRuleList)) {
                 List<String> ruleList = new ArrayList<>();
                 //把规则名称处理
-                for (ActivityRule activityRule:activityRuleList) {
+                for (ActivityRule activityRule : activityRuleList) {
                     ruleList.add(this.getRuleDesc(activityRule));
                 }
-                result.put(skuId,ruleList);
+                result.put(skuId, ruleList);
             }
         });
         return result;
     }
+
 
     //构造规则名称的方法
     private String getRuleDesc(ActivityRule activityRule) {

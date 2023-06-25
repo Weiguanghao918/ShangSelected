@@ -63,4 +63,13 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      * @return 封装后的map集合，其中，SkuId为键，促销活动描述为值
      */
     Map<Long, List<String>> findActivity(List<Long> skuIdList);
+
+    /**
+     * 根据 skuId和userId 封装活动和促销券信息
+     *
+     * @param skuId  skuId
+     * @param userId userId
+     * @return 封装集合
+     */
+    Map<String, Object> findActivityAndCoupon(Long skuId, Long userId);
 }

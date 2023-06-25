@@ -16,12 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +40,8 @@ public class SkuServiceImpl implements SkuService {
     private SkuRepository skuRepository;
     @Autowired
     private ActivityFeignClient activityFeignClient;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
 
     @Override
@@ -111,5 +115,22 @@ public class SkuServiceImpl implements SkuService {
             }
         }
         return page;
+    }
+
+    @Override
+    public void incrHtScore(Long skuId) {
+        //这部分的思路是现在redis中更新商品点击次数，达到一定次数后，再去es中更新热度，减少es更新操作的频率
+        String hotKey = "hotScore";
+
+        //保存数据
+        Double hotScore = redisTemplate.opsForZSet().incrementScore(hotKey, "skuId:" + skuId, 1);
+        if (hotScore % 10 == 0) {
+            //更新es
+            Optional<SkuEs> optional = skuRepository.findById(skuId);
+            SkuEs skuEs = optional.get();
+            skuEs.setHotScore(Math.round(hotScore));
+            skuRepository.save(skuEs);
+        }
+
     }
 }

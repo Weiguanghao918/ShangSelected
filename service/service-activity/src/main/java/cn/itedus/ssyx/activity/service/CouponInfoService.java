@@ -53,4 +53,13 @@ public interface CouponInfoService extends IService<CouponInfo> {
      * @return 优惠券列表
      */
     List<CouponInfo> findCouponByKeyword(String keyword);
+
+    /**
+     * 根据skuId和userId 获取优惠券信息
+     *
+     * @param skuId  skuId
+     * @param userId userId
+     * @return 优惠券信息
+     */
+    List<CouponInfo> findCouponInfo(Long skuId, Long userId);
 }

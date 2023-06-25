@@ -59,4 +59,12 @@ public class SkuSearchController {
         return Result.ok(pageModel);
     }
 
+    @ApiOperation("增加商品热度")
+    @GetMapping("inner/incrHotScore/{skuId}")
+    public Boolean incrHotScore(@PathVariable("skuId") Long skuId) {
+        skuService.incrHtScore(skuId);
+        return true;
+    }
+
+
 }

@@ -1,9 +1,11 @@
 package cn.itedus.ssyx.product.api;
 
+import cn.itedus.ssyx.common.result.Result;
 import cn.itedus.ssyx.model.product.Category;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.product.service.CategoryService;
 import cn.itedus.ssyx.product.service.SkuInfoService;
+import cn.itedus.ssyx.vo.product.SkuInfoVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +75,13 @@ public class ProductInnerController {
     public List<SkuInfo> findNewPersonSkuInfoList() {
         List<SkuInfo> skuInfoList = skuInfoService.findNewPersonSkuInfoList();
         return skuInfoList;
+    }
+
+    @ApiOperation("获取商品Sku信息")
+    @GetMapping("inner/{id}")
+    public SkuInfoVo getSkuInfoById(@PathVariable("id") Long id) {
+        SkuInfoVo skuInfoVo = skuInfoService.getSkuInfoVo(id);
+        return skuInfoVo;
     }
 
 }
