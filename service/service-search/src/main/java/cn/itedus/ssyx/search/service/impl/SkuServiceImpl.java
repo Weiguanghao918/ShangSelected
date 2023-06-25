@@ -93,18 +93,18 @@ public class SkuServiceImpl implements SkuService {
     public Page<SkuEs> search(Pageable pageable, SkuEsQueryVo skuEsQueryVo) {
         skuEsQueryVo.setWareId(AuthContextHolder.getWareId());
         Page<SkuEs> page = null;
-        if(StringUtils.isEmpty(skuEsQueryVo.getKeyword())) {
+        if (StringUtils.isEmpty(skuEsQueryVo.getKeyword())) {
             page = skuRepository.findByCategoryIdAndWareId(skuEsQueryVo.getCategoryId(), skuEsQueryVo.getWareId(), pageable);
         } else {
             page = skuRepository.findByKeywordAndWareId(skuEsQueryVo.getKeyword(), skuEsQueryVo.getWareId(), pageable);
         }
 
-        List<SkuEs>  skuEsList =  page.getContent();
+        List<SkuEs> skuEsList = page.getContent();
         //获取sku对应的促销活动标签
-        if(!CollectionUtils.isEmpty(skuEsList)) {
+        if (!CollectionUtils.isEmpty(skuEsList)) {
             List<Long> skuIdList = skuEsList.stream().map(sku -> sku.getId()).collect(Collectors.toList());
             Map<Long, List<String>> skuIdToRuleListMap = activityFeignClient.findActivity(skuIdList);
-            if(null != skuIdToRuleListMap) {
+            if (null != skuIdToRuleListMap) {
                 skuEsList.forEach(skuEs -> {
                     skuEs.setRuleList(skuIdToRuleListMap.get(skuEs.getId()));
                 });
