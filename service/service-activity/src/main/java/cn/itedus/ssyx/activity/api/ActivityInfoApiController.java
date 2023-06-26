@@ -1,11 +1,14 @@
 package cn.itedus.ssyx.activity.api;
 
 import cn.itedus.ssyx.activity.service.ActivityInfoService;
+import cn.itedus.ssyx.model.order.CartInfo;
+import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,6 +38,12 @@ public class ActivityInfoApiController {
                                                      @PathVariable("userId") Long userId) {
         Map<String, Object> map = activityInfoService.findActivityAndCoupon(skuId, userId);
         return map;
+    }
+
+    @ApiOperation(value = "获取购物车满足条件的促销与优惠券信息")
+    @PostMapping("inner/findCartActivityAndCoupon/{userId}")
+    public OrderConfirmVo findCartActivityAndCoupon(@RequestBody List<CartInfo> cartInfoList, @PathVariable("userId") Long userId, HttpServletRequest request) {
+        return activityInfoService.findCartActivityAndCoupon(cartInfoList, userId);
     }
 
 }

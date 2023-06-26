@@ -5,6 +5,7 @@
 
     <resultMap id="ActivityRuleMap" type="cn.itedus.ssyx.model.activity.ActivityRule" autoMapping="true">
     </resultMap>
+    <resultMap id="ActivitySkuMap" type="cn.itedus.ssyx.model.activity.ActivitySku" autoMapping="true"></resultMap>
 
 
     <select id="selecExistIdList" resultType="Long">
@@ -38,5 +39,20 @@
           and now() between info.start_time and info.end_time
           and sku.is_deleted = 0 and rule.is_deleted = 0 and info.is_deleted = 0
         order by rule.condition_amount desc, rule.condition_num desc
+    </select>
+
+    <select id="selectCartActivityList" resultMap="ActivitySkuMap">
+        select *
+        from activity_info info
+        inner join activity_sku sku on info.id = sku.activity_id
+        <where>
+            <if test="null != skuIdList">
+                and sku.sku_id in
+                <foreach collection="skuIdList" item="item" index="index" separator="," open="(" close=")">
+                    {item}
+                </foreach>
+            </if>
+            and now() between info.start_time and info.end_time
+        </where>
     </select>
 </mapper>

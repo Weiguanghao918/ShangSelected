@@ -1,5 +1,7 @@
 package cn.itedus.ssyx.cart.service;
 
+import cn.itedus.ssyx.model.order.CartInfo;
+
 import java.util.List;
 
 /**
@@ -39,4 +41,12 @@ public interface CartInfoService {
      * @param skuIdList skuId集合
      */
     void batchDeleteCart(Long userId, List<Long> skuIdList);
+
+    /**
+     * 获取不带优惠券的购物车列表
+     *
+     * @param userId userId
+     * @return 购物车列表集合
+     */
+    List<CartInfo> getCartList(Long userId);
 }

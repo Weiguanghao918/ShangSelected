@@ -3,6 +3,7 @@ package cn.itedus.ssyx.cart.controller;
 import cn.itedus.ssyx.cart.service.CartInfoService;
 import cn.itedus.ssyx.common.auth.AuthContextHolder;
 import cn.itedus.ssyx.common.result.Result;
+import cn.itedus.ssyx.model.order.CartInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Delete;
@@ -57,5 +58,19 @@ public class CartInfoController {
         return Result.ok();
     }
 
+    @ApiOperation("查询购物车列表，不带优惠券")
+    @GetMapping("cartList")
+    public Result cartList() {
+        Long userId = AuthContextHolder.getUserId();
+        List<CartInfo> cartInfoList = cartInfoService.getCartList(userId);
+        return Result.ok(cartInfoList);
+    }
+
+    @ApiOperation("查询购物车列表，带优惠券")
+    @GetMapping("activityCartList")
+    public Result activityCartList() {
+        Long userId = AuthContextHolder.getUserId();
+        return null;
+    }
 
 }

@@ -2,6 +2,7 @@ package cn.itedus.ssyx.activity.mapper;
 
 import cn.itedus.ssyx.model.activity.ActivityInfo;
 import cn.itedus.ssyx.model.activity.ActivityRule;
+import cn.itedus.ssyx.model.activity.ActivitySku;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,4 +21,5 @@ public interface ActivityInfoMapper extends BaseMapper<ActivityInfo> {
 
     List<ActivityRule> selectActivityRuleList(@Param("skuId") Long skuId);
 
+    List<ActivitySku> selectCartActivityList(@Param("skuIdList") List<Long> skuIdList);
 }

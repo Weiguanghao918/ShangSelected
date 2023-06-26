@@ -12,8 +12,11 @@ import cn.itedus.ssyx.model.activity.ActivityInfo;
 import cn.itedus.ssyx.model.activity.ActivityRule;
 import cn.itedus.ssyx.model.activity.ActivitySku;
 import cn.itedus.ssyx.model.activity.CouponInfo;
+import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.activity.ActivityRuleVo;
+import cn.itedus.ssyx.vo.order.CartInfoVo;
+import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,6 +64,233 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         result.put("couponInfoList", couponInfoList);
         return result;
 
+    }
+
+    @Override
+    public OrderConfirmVo findCartActivityAndCoupon(List<CartInfo> cartInfoList, Long userId) {
+        List<CartInfoVo> cartInfoVoList = this.findCartActivityList(cartInfoList);
+
+
+        return null;
+    }
+
+    @Override
+    public List<CartInfoVo> findCartActivityList(List<CartInfo> cartInfoList) {
+        List<CartInfoVo> cartInfoVoList = new ArrayList<>();
+        //第一步：将购物车中参与相同活动的购物项放在一起 Map<Long,Set<Long>>
+        //获取skuId集合
+        List<Long> skuIdList = cartInfoList.stream().map(CartInfo::getSkuId).collect(Collectors.toList());
+        //获取skuIdList对应的全部促销规则
+        List<ActivitySku> activitySkuList = activityInfoMapper.selectCartActivityList(skuIdList);
+        //分组处理，活动id为键，skuId集合为值（参与同一活动）
+        Map<Long, Set<Long>> activityIdToSkuIdListMap = activitySkuList.stream().collect(Collectors.groupingBy(ActivitySku::getActivityId, Collectors.mapping(ActivitySku::getSkuId, Collectors.toSet())));
+
+        //第二步：将同一个活动下的多个规则放在一起 Map<Long,List<ActivityRule>>
+        //获取活动对应的促销信息（活动规则）
+        Set<Long> activityIdSet = activitySkuList.stream().map(ActivitySku::getActivityId).collect(Collectors.toSet());
+        Map<Long, List<ActivityRule>> activityIdToActivityRuleListMap = new HashMap<>();
+
+        if (!CollectionUtils.isEmpty(activityIdSet)) {
+            LambdaQueryWrapper<ActivityRule> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.orderByDesc(ActivityRule::getConditionAmount, ActivityRule::getConditionNum);
+            lambdaQueryWrapper.in(ActivityRule::getActivityId, activityIdSet);
+            List<ActivityRule> activityRuleList = activityRuleMapper.selectList(lambdaQueryWrapper);
+
+            //按照活动Id分组，获取活动对应的规则集合
+            activityIdToActivityRuleListMap = activityRuleList.stream().collect(Collectors.groupingBy(activityRule -> activityRule.getActivityId()));
+        }
+
+        //第三步：根据活动汇总购物项，相同活动的购物项为为一组显示在页面，并且计算最优惠金额
+        //记录有活动的购物项skuId
+        Set<Long> activitySkuIdSet = new HashSet<>();
+        if (!CollectionUtils.isEmpty(activityIdToSkuIdListMap)) {
+            Iterator<Map.Entry<Long, Set<Long>>> iterator = activityIdToSkuIdListMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Long, Set<Long>> entry = iterator.next();
+                Long activityId = entry.getKey();
+                //当前活动对应的购物项skuId列表
+                Set<Long> currentActivitySkuIdSet = entry.getValue();
+                //当前活动对应的购物项列表
+                List<CartInfo> currentActivityCartInfoList = cartInfoList.stream().filter(cartInfo -> currentActivitySkuIdSet.contains(cartInfo.getSkuId())).collect(Collectors.toList());
+                //当前活动的总金额
+                BigDecimal activityTotalAmount = this.computeTotalAmount(currentActivityCartInfoList);
+                //当前活动的购物项总个数
+                Integer activityCartTotalNum = this.computeCartNum(currentActivityCartInfoList);
+
+                //计算当前活动的最优惠规则
+                //活动当前的对应的规则
+                List<ActivityRule> currentActivityRuleList = activityIdToActivityRuleListMap.get(activityId);
+                ActivityType activityType = currentActivityRuleList.get(0).getActivityType();
+                ActivityRule optimalActivityRule = null;
+                if (activityType == ActivityType.FULL_REDUCTION) {
+                    optimalActivityRule = this.computeFullReduction(activityTotalAmount, currentActivityRuleList);
+                } else {
+                    optimalActivityRule = this.computeFullDiscount(activityCartTotalNum, activityTotalAmount, currentActivityRuleList);
+                }
+
+                //同一活动对应的购物项列表与对应优化规则
+                CartInfoVo cartInfoVo = new CartInfoVo();
+                cartInfoVo.setCartInfoList(currentActivityCartInfoList);
+                cartInfoVo.setActivityRule(optimalActivityRule);
+                cartInfoVoList.add(cartInfoVo);
+                //记录
+                activitySkuIdSet.addAll(currentActivitySkuIdSet);
+            }
+        }
+        //第四步：无活动的购物项，每一项一组
+        skuIdList.removeAll(activitySkuIdSet);
+        if (!CollectionUtils.isEmpty(skuIdList)) {
+            //获取skuId对应的购物项
+            Map<Long, CartInfo> skuIdCartInfoMap = cartInfoList.stream().collect(Collectors.toMap(CartInfo::getSkuId, CartInfo -> CartInfo));
+            for (Long skuId : skuIdList) {
+                CartInfoVo cartInfoVo = new CartInfoVo();
+                cartInfoVo.setActivityRule(null);
+                List<CartInfo> currentCartInfoList = new ArrayList<>();
+                currentCartInfoList.add(skuIdCartInfoMap.get(skuId));
+                cartInfoVo.setCartInfoList(currentCartInfoList);
+                cartInfoVoList.add(cartInfoVo);
+            }
+        }
+        return cartInfoVoList;
+    }
+
+    @Override
+    public List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId) {
+        return null;
+    }
+
+    /**
+     * 计算满量打折最优规则
+     *
+     * @param activityCartTotalNum    总数量
+     * @param activityTotalAmount     总金额
+     * @param currentActivityRuleList 当前规则列表
+     * @return 满量打折最优规则
+     */
+    private ActivityRule computeFullDiscount(Integer activityCartTotalNum, BigDecimal activityTotalAmount, List<ActivityRule> currentActivityRuleList) {
+        ActivityRule optimalActivityRule = null;
+        for (ActivityRule activityRule : currentActivityRuleList) {
+            if (activityCartTotalNum.intValue() >= activityRule.getConditionNum()) {
+                BigDecimal skuDiscountTotalAmount = activityTotalAmount.multiply(activityRule.getBenefitDiscount().divide(new BigDecimal("10")));
+                BigDecimal reduceAmount = activityTotalAmount.multiply(skuDiscountTotalAmount);
+                activityRule.setReduceAmount(reduceAmount);
+                optimalActivityRule = activityRule;
+                break;
+            }
+        }
+        if (null == optimalActivityRule) {
+            //如果没有满足条件的取最小满足条件的一项
+            optimalActivityRule = currentActivityRuleList.get(currentActivityRuleList.size() - 1);
+            optimalActivityRule.setReduceAmount(new BigDecimal("0"));
+            optimalActivityRule.setSelectType(1);
+
+            StringBuffer ruleDesc = new StringBuffer()
+                    .append("满")
+                    .append(optimalActivityRule.getConditionNum())
+                    .append("元打")
+                    .append(optimalActivityRule.getBenefitDiscount())
+                    .append("折，还差")
+                    .append(activityCartTotalNum - optimalActivityRule.getConditionNum())
+                    .append("件");
+            optimalActivityRule.setRuleDesc(ruleDesc.toString());
+        } else {
+            StringBuffer ruleDesc = new StringBuffer()
+                    .append("满")
+                    .append(optimalActivityRule.getConditionNum())
+                    .append("元打")
+                    .append(optimalActivityRule.getBenefitDiscount())
+                    .append("折，已减")
+                    .append(optimalActivityRule.getReduceAmount())
+                    .append("元");
+            optimalActivityRule.setRuleDesc(ruleDesc.toString());
+            optimalActivityRule.setSelectType(2);
+        }
+        return optimalActivityRule;
+    }
+
+    /**
+     * 计算满减活动中最优的规则是什么
+     *
+     * @param activityTotalAmount     总金额
+     * @param currentActivityRuleList 规则集合
+     * @return 最优满减规则
+     */
+    private ActivityRule computeFullReduction(BigDecimal activityTotalAmount, List<ActivityRule> currentActivityRuleList) {
+        ActivityRule optimalActivityRule = null;
+        //该活动skuActivityRuleList数据，已经按照优惠金额从大到小排序了
+        for (ActivityRule activityRule : currentActivityRuleList) {
+            //如果订单金额大于满减金额，则优惠金额
+            if (activityTotalAmount.compareTo(activityRule.getConditionAmount()) > -1) {
+                //优惠后减少金额
+                activityRule.setReduceAmount(activityRule.getBenefitAmount());
+                optimalActivityRule = activityRule;
+                break;
+            }
+        }
+        if (null == optimalActivityRule) {
+            //如果没有满足条件的取最小满足条件的一项
+            optimalActivityRule = currentActivityRuleList.get(currentActivityRuleList.size() - 1);
+            optimalActivityRule.setReduceAmount(new BigDecimal("0"));
+            optimalActivityRule.setSelectType(1);
+
+            StringBuffer ruleDesc = new StringBuffer()
+                    .append("满")
+                    .append(optimalActivityRule.getConditionAmount())
+                    .append("元减")
+                    .append(optimalActivityRule.getBenefitAmount())
+                    .append("元，还差")
+                    .append(activityTotalAmount.subtract(optimalActivityRule.getConditionAmount()))
+                    .append("元");
+            optimalActivityRule.setRuleDesc(ruleDesc.toString());
+        } else {
+            StringBuffer ruleDesc = new StringBuffer()
+                    .append("满")
+                    .append(optimalActivityRule.getConditionAmount())
+                    .append("元减")
+                    .append(optimalActivityRule.getBenefitAmount())
+                    .append("元，已减")
+                    .append(optimalActivityRule.getReduceAmount())
+                    .append("元");
+            optimalActivityRule.setRuleDesc(ruleDesc.toString());
+            optimalActivityRule.setSelectType(2);
+        }
+
+        return optimalActivityRule;
+
+    }
+
+    /**
+     * 计算当前购物项有多少件
+     *
+     * @param currentActivityCartInfoList 当前购物车集合
+     * @return 总数量
+     */
+    private Integer computeCartNum(List<CartInfo> currentActivityCartInfoList) {
+        int total = 0;
+        for (CartInfo cartInfo : currentActivityCartInfoList) {
+            if (cartInfo.getIsChecked().intValue() == 1) {
+                total += cartInfo.getSkuNum();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 计算购物项集合总金额
+     *
+     * @param currentActivityCartInfoList 当前购物项
+     * @return 总金额
+     */
+    private BigDecimal computeTotalAmount(List<CartInfo> currentActivityCartInfoList) {
+        BigDecimal total = new BigDecimal(0);
+        for (CartInfo cartInfo : currentActivityCartInfoList) {
+            //是否选中
+            if (cartInfo.getIsChecked().intValue() == 1) {
+                BigDecimal itemAmount = cartInfo.getCartPrice().multiply(new BigDecimal(cartInfo.getSkuNum()));
+                total = total.add(itemAmount);
+            }
+        }
+        return total;
     }
 
     @Override

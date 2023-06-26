@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -110,6 +113,28 @@ public class CartInfoServiceImpl implements CartInfoService {
         skuIdList.forEach(skuId -> {
             hashOperations.delete(skuId.toString());
         });
+    }
+
+    @Override
+    public List<CartInfo> getCartList(Long userId) {
+        List<CartInfo> cartInfoList = new ArrayList<>();
+        if (null == userId) {
+            return cartInfoList;
+        }
+
+        String cartKey = this.getCartKey(userId);
+        BoundHashOperations<String, String, CartInfo> hashOperations = redisTemplate.boundHashOps(cartKey);
+        cartInfoList = hashOperations.values();
+
+        if (!CollectionUtils.isEmpty(cartInfoList)) {
+            cartInfoList.sort(new Comparator<CartInfo>() {
+                @Override
+                public int compare(CartInfo o1, CartInfo o2) {
+                    return o2.getCreateTime().compareTo(o1.getCreateTime());
+                }
+            });
+        }
+        return cartInfoList;
     }
 
     /**

@@ -2,8 +2,12 @@ package cn.itedus.ssyx.activity.service;
 
 import cn.itedus.ssyx.model.activity.ActivityInfo;
 import cn.itedus.ssyx.model.activity.ActivityRule;
+import cn.itedus.ssyx.model.activity.CouponInfo;
+import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.activity.ActivityRuleVo;
+import cn.itedus.ssyx.vo.order.CartInfoVo;
+import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -72,4 +76,30 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      * @return 封装集合
      */
     Map<String, Object> findActivityAndCoupon(Long skuId, Long userId);
+
+    /**
+     * 获取购物车满足条件的促销与优惠券信息
+     *
+     * @param cartInfoList 购物车项集合
+     * @param userId       userId
+     * @return 订单vo类
+     */
+    OrderConfirmVo findCartActivityAndCoupon(List<CartInfo> cartInfoList, Long userId);
+
+    /**
+     * 封装cartInfoVo集合
+     *
+     * @param cartInfoList 购物车项集合
+     * @return 封装结果
+     */
+    List<CartInfoVo> findCartActivityList(List<CartInfo> cartInfoList);
+
+    /**
+     * 查找优惠券信息
+     *
+     * @param cartInfoList 购物车项集合
+     * @param userId       userId
+     * @return 购物券集合
+     */
+    List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId);
 }
