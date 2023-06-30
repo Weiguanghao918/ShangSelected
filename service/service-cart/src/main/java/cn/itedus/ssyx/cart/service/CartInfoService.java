@@ -49,4 +49,30 @@ public interface CartInfoService {
      * @return 购物车列表集合
      */
     List<CartInfo> getCartList(Long userId);
+
+    /**
+     * 更改购物项状态
+     *
+     * @param userId    userId
+     * @param isChecked 状态值
+     * @param skuId     商品skuId
+     */
+    void checkCart(Long userId, Integer isChecked, Long skuId);
+
+    /**
+     * 更改所有购物项状态
+     *
+     * @param userId    userId
+     * @param isChecked 状态值
+     */
+    void checkAllCart(Long userId, Integer isChecked);
+
+    /**
+     * 批量更新购物项状态
+     *
+     * @param skuIdList 购物项id集合
+     * @param userId    userId
+     * @param isChecked 状态值
+     */
+    void batchCheckCart(List<Long> skuIdList, Long userId, Integer isChecked);
 }

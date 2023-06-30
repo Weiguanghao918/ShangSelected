@@ -1,6 +1,8 @@
 package cn.itedus.ssyx.activity.service;
 
 import cn.itedus.ssyx.model.activity.CouponInfo;
+import cn.itedus.ssyx.model.activity.CouponRange;
+import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.vo.activity.CouponRuleVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -62,4 +64,23 @@ public interface CouponInfoService extends IService<CouponInfo> {
      * @return 优惠券信息
      */
     List<CouponInfo> findCouponInfo(Long skuId, Long userId);
+
+    /**
+     * 查找优惠券信息
+     *
+     * @param cartInfoList 购物车项集合
+     * @param userId       userId
+     * @return 购物券集合
+     */
+    List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId);
+
+    /**
+     * 获取优惠券id对应的满足使用范围的购物项skuId列表
+     * 说明：一个优惠券可能有多个购物项满足它的使用范围，那么多个购物项可以拼单使用这个优惠券
+     *
+     * @param cartInfoList
+     * @param couponRangeList
+     * @return
+     */
+    Map<Long, List<Long>> findCouponIdToSkuIdMap(List<CartInfo> cartInfoList, List<CouponRange> couponRangeList);
 }

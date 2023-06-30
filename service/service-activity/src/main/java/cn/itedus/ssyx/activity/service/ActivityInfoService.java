@@ -94,12 +94,5 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      */
     List<CartInfoVo> findCartActivityList(List<CartInfo> cartInfoList);
 
-    /**
-     * 查找优惠券信息
-     *
-     * @param cartInfoList 购物车项集合
-     * @param userId       userId
-     * @return 购物券集合
-     */
-    List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId);
+
 }

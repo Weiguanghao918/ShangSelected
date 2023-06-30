@@ -1,9 +1,12 @@
 package cn.itedus.ssyx.cart.controller;
 
+import cn.itedus.ssyx.activity.client.ActivityFeignClient;
 import cn.itedus.ssyx.cart.service.CartInfoService;
 import cn.itedus.ssyx.common.auth.AuthContextHolder;
 import cn.itedus.ssyx.common.result.Result;
 import cn.itedus.ssyx.model.order.CartInfo;
+import cn.itedus.ssyx.vo.order.OrderConfirmVo;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.ResultTreeType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Delete;
@@ -11,6 +14,7 @@ import org.apache.ibatis.annotations.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -24,6 +28,8 @@ import java.util.List;
 public class CartInfoController {
     @Autowired
     private CartInfoService cartInfoService;
+    @Autowired
+    private ActivityFeignClient activityFeignClient;
 
     @ApiOperation("添加购物车")
     @GetMapping("addToCart/{skuId}/{skuNum}")
@@ -70,7 +76,37 @@ public class CartInfoController {
     @GetMapping("activityCartList")
     public Result activityCartList() {
         Long userId = AuthContextHolder.getUserId();
-        return null;
+        List<CartInfo> cartList = cartInfoService.getCartList(userId);
+        OrderConfirmVo orderTradeVo = activityFeignClient.findCartActivityAndCoupon(cartList, userId);
+        return Result.ok(orderTradeVo);
     }
 
+    @ApiOperation("更新选中状态")
+    @GetMapping("checkCart/{skuId}/{isChecked}")
+    public Result checkCart(@PathVariable("skuId") Long skuId,
+                            @PathVariable("isChecked") Integer isChecked) {
+        Long userId = AuthContextHolder.getUserId();
+        cartInfoService.checkCart(userId, isChecked, skuId);
+        return Result.ok();
+    }
+
+    @ApiOperation("更新全部状态")
+    @GetMapping("checkAllCart/{isChecked}")
+    public Result checkAllCart(@PathVariable(value = "isChecked") Integer isChecked) {
+        // 获取用户Id
+        Long userId = AuthContextHolder.getUserId();
+        // 调用更新方法
+        cartInfoService.checkAllCart(userId, isChecked);
+        return Result.ok();
+    }
+
+
+    @ApiOperation(value = "批量选择购物车")
+    @PostMapping("batchCheckCart/{isChecked}")
+    public Result batchCheckCart(@RequestBody List<Long> skuIdList, @PathVariable(value = "isChecked") Integer isChecked) {
+        // 如何获取userId
+        Long userId = AuthContextHolder.getUserId();
+        cartInfoService.batchCheckCart(skuIdList, userId, isChecked);
+        return Result.ok();
+    }
 }
