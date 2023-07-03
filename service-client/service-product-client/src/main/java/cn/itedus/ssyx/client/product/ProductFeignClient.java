@@ -3,6 +3,7 @@ package cn.itedus.ssyx.client.product;
 import cn.itedus.ssyx.model.product.Category;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.product.SkuInfoVo;
+import cn.itedus.ssyx.vo.product.SkuStockLockVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,4 +88,14 @@ public interface ProductFeignClient {
      */
     @GetMapping("/api/product/inner/{id}")
     public SkuInfoVo getSkuInfoById(@PathVariable("id") Long skuId);
+
+    /**
+     * 校验库存并且锁定商品库存
+     *
+     * @param skuStockLockVoList 商品列表
+     * @param orderNo            订单号
+     * @return 是否成功
+     */
+    @PostMapping("/api/product/inner/ckeckAndLock/{orderNo}")
+    public Boolean checkAndLock(@RequestBody List<SkuStockLockVo> skuStockLockVoList, @PathVariable("orderNo") String orderNo);
 }

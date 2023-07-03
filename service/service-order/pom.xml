@@ -5,19 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>cn.itedus</groupId>
-        <artifactId>ssyx-parent</artifactId>
+        <artifactId>service</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>service-client</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>service-product-client</module>
-        <module>service-user-client</module>
-        <module>service-search-client</module>
-        <module>service-activity-client</module>
-        <module>service-cart-client</module>
-    </modules>
+    <artifactId>service-order</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -28,30 +20,28 @@
     <dependencies>
         <dependency>
             <groupId>cn.itedus</groupId>
-            <artifactId>common-util</artifactId>
+            <artifactId>service-activity-client</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>provided </scope>
         </dependency>
 
         <dependency>
             <groupId>cn.itedus</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>service-user-client</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>provided </scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <scope>provided </scope>
+            <groupId>cn.itedus</groupId>
+            <artifactId>service-cart-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- 服务调用feign -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <scope>provided </scope>
+            <groupId>cn.itedus</groupId>
+            <artifactId>service-product-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
 </project>

@@ -3,6 +3,7 @@ package cn.itedus.ssyx.product.service;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.product.SkuInfoQueryVo;
 import cn.itedus.ssyx.vo.product.SkuInfoVo;
+import cn.itedus.ssyx.vo.product.SkuStockLockVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -102,7 +103,17 @@ public interface SkuInfoService extends IService<SkuInfo> {
 
     /**
      * 获取新人专享商品
+     *
      * @return 新人专享Sku列表
      */
     List<SkuInfo> findNewPersonSkuInfoList();
+
+    /**
+     * 锁定商品库存
+     *
+     * @param skuStockLockVoList 商品列表
+     * @param orderNo            订单号
+     * @return 是否成功
+     */
+    Boolean checkAndLock(List<SkuStockLockVo> skuStockLockVoList, String orderNo);
 }

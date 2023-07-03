@@ -109,4 +109,11 @@ public class CartInfoController {
         cartInfoService.batchCheckCart(skuIdList, userId, isChecked);
         return Result.ok();
     }
+
+
+    @ApiOperation("根据用户Id查询购物车列表，已选中的部分")
+    @GetMapping("inner/getCartCheckedList/{userId}")
+    public List<CartInfo> getCartCheckedList(@PathVariable("userId") Long userId) {
+        return cartInfoService.getCartCheckedList(userId);
+    }
 }

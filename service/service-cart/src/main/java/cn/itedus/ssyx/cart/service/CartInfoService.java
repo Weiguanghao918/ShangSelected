@@ -75,4 +75,12 @@ public interface CartInfoService {
      * @param isChecked 状态值
      */
     void batchCheckCart(List<Long> skuIdList, Long userId, Integer isChecked);
+
+    /**
+     * 根据用户Id获取已选中的购物项
+     *
+     * @param userId userId
+     * @return 购物项集合
+     */
+    List<CartInfo> getCartCheckedList(Long userId);
 }

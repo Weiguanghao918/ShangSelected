@@ -14,6 +14,19 @@ spring:
     username: root
     password: 980918
 
+  redis:
+    host: 192.168.10.101
+    port: 6379
+    password: 111111
+    database: 0
+    timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8

@@ -1,5 +1,9 @@
 package cn.itedus.ssyx.product.service.impl;
 
+import cn.itedus.ssyx.common.config.RedissonConfig;
+import cn.itedus.ssyx.common.constant.RedisConst;
+import cn.itedus.ssyx.common.exception.SsyxException;
+import cn.itedus.ssyx.common.result.ResultCodeEnum;
 import cn.itedus.ssyx.model.product.SkuAttrValue;
 import cn.itedus.ssyx.model.product.SkuImage;
 import cn.itedus.ssyx.model.product.SkuInfo;
@@ -13,10 +17,13 @@ import cn.itedus.ssyx.product.service.SkuInfoService;
 import cn.itedus.ssyx.product.service.SkuPosterService;
 import cn.itedus.ssyx.vo.product.SkuInfoQueryVo;
 import cn.itedus.ssyx.vo.product.SkuInfoVo;
+import cn.itedus.ssyx.vo.product.SkuStockLockVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +54,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Autowired
     private RabbitService rabbitService;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public IPage<SkuInfo> selectPageInfo(Page<SkuInfo> pageParam, SkuInfoQueryVo skuInfoQueryVo) {
@@ -258,5 +268,53 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
         IPage<SkuInfo> skuInfoPage = skuInfoMapper.selectPage(page, lambdaQueryWrapper);
         List<SkuInfo> skuInfoList = skuInfoPage.getRecords();
         return skuInfoList;
+    }
+
+    @Override
+    public Boolean checkAndLock(List<SkuStockLockVo> skuStockLockVoList, String orderNo) {
+        if (CollectionUtils.isEmpty(skuStockLockVoList)) {
+            throw new SsyxException(ResultCodeEnum.DATA_ERROR);
+        }
+        //遍历所有商品，验证库存并且锁定库存，需要具备原子性，使用分布式锁完成
+        skuStockLockVoList.forEach(skuStockLockVo -> {
+            this.checkLock(skuStockLockVo);
+        });
+
+        //一旦有一个库存锁定失败，那么所有的锁定成功的商品都要解锁库存
+        boolean flag = skuStockLockVoList.stream().anyMatch(skuStockLockVo -> !skuStockLockVo.getIsLock());
+        if (!flag) {
+            //所有锁定商品需要进行解锁
+            skuStockLockVoList.stream().filter(skuStockLockVo -> skuStockLockVo.getIsLock()).forEach(skuStockLockVo -> {
+                skuInfoMapper.unlockStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());
+            });
+            //相应锁定状态
+            return false;
+        }
+        return true;
+
+    }
+
+    private void checkLock(SkuStockLockVo skuStockLockVo) {
+        //这里使用Redisson公平锁来完成分布式锁锁定库存的操作
+        RLock rLock = redissonClient.getFairLock(RedisConst.SKUKEY_PREFIX + skuStockLockVo.getSkuId());
+        rLock.lock();
+
+        try {
+            //检验库存：查询，返回的是满足要求的库存列表
+            SkuInfo skuInfo = skuInfoMapper.checkStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());
+            //如果不存在满足要求的产品，那么验证库存失败
+            if (null == skuInfo) {
+                skuStockLockVo.setIsLock(false);
+                return;
+            }
+            //锁定库存：更新操作
+            Integer rows = skuInfoMapper.lockStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());
+            if (rows == 1) {
+                skuStockLockVo.setIsLock(true);
+            }
+
+        } finally {
+            rLock.unlock();
+        }
     }
 }

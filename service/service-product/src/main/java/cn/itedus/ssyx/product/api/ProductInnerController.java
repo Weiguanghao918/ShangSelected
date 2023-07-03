@@ -6,6 +6,7 @@ import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.product.service.CategoryService;
 import cn.itedus.ssyx.product.service.SkuInfoService;
 import cn.itedus.ssyx.vo.product.SkuInfoVo;
+import cn.itedus.ssyx.vo.product.SkuStockLockVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,12 @@ public class ProductInnerController {
     public SkuInfoVo getSkuInfoById(@PathVariable("id") Long id) {
         SkuInfoVo skuInfoVo = skuInfoService.getSkuInfoVo(id);
         return skuInfoVo;
+    }
+
+    @ApiOperation("锁定库存")
+    @PostMapping("inner/ckeckAndLock/{orderNo}")
+    public Boolean checkAndLock(@RequestBody List<SkuStockLockVo> skuStockLockVoList, @PathVariable("orderNo") String orderNo) {
+        return skuInfoService.checkAndLock(skuStockLockVoList, orderNo);
     }
 
 }

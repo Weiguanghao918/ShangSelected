@@ -8,6 +8,7 @@ import cn.itedus.ssyx.common.result.ResultCodeEnum;
 import cn.itedus.ssyx.enums.SkuType;
 import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.model.product.SkuInfo;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author: Guanghao Wei
@@ -169,6 +171,15 @@ public class CartInfoServiceImpl implements CartInfoService {
             cartInfo.setIsChecked(isChecked);
             hashOperations.put(skuId.toString(), cartInfo);
         });
+    }
+
+    @Override
+    public List<CartInfo> getCartCheckedList(Long userId) {
+        String cartKey = this.getCartKey(userId);
+        BoundHashOperations<String,String, CartInfo> hashOperations = redisTemplate.boundHashOps(cartKey);
+        List<CartInfo> cartInfoCheckedList = hashOperations.values().stream().filter(cartInfo -> cartInfo.getIsChecked().intValue() == 1).collect(Collectors.toList());
+
+        return cartInfoCheckedList;
     }
 
     /**
