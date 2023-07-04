@@ -265,6 +265,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             if (hashOperations.hasKey(cartInfo.getSkuId().toString())) {
                 Integer orderSkuNum = hashOperations.get(cartInfo.getSkuId().toString()) + cartInfo.getSkuNum();
                 hashOperations.put(cartInfo.getSkuId().toString(), orderSkuNum);
+            } else {
+                hashOperations.put(cartInfo.getSkuId().toString(), cartInfo.getSkuNum());
             }
         });
         redisTemplate.expire(orderSkuKey, DateUtil.getCurrentExpireTimes(), TimeUnit.SECONDS);
