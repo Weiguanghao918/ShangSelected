@@ -176,10 +176,23 @@ public class CartInfoServiceImpl implements CartInfoService {
     @Override
     public List<CartInfo> getCartCheckedList(Long userId) {
         String cartKey = this.getCartKey(userId);
-        BoundHashOperations<String,String, CartInfo> hashOperations = redisTemplate.boundHashOps(cartKey);
+        BoundHashOperations<String, String, CartInfo> hashOperations = redisTemplate.boundHashOps(cartKey);
         List<CartInfo> cartInfoCheckedList = hashOperations.values().stream().filter(cartInfo -> cartInfo.getIsChecked().intValue() == 1).collect(Collectors.toList());
 
         return cartInfoCheckedList;
+    }
+
+    @Override
+    public void deleteCartChecked(Long userId) {
+        List<CartInfo> cartInfoList = this.getCartCheckedList(userId);
+        List<Long> skuIdList = cartInfoList.stream().map(CartInfo::getSkuId).collect(Collectors.toList());
+
+        String cartKey = this.getCartKey(userId);
+        BoundHashOperations<String, String, CartInfo> hashOperations = redisTemplate.boundHashOps(cartKey);
+        skuIdList.forEach(skuId -> {
+            hashOperations.delete(skuId.toString());
+        });
+
     }
 
     /**

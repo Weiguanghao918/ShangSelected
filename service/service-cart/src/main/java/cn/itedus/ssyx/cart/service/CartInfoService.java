@@ -83,4 +83,10 @@ public interface CartInfoService {
      * @return 购物项集合
      */
     List<CartInfo> getCartCheckedList(Long userId);
+
+    /**
+     * 根据userId删除购物车已下单项目
+     * @param userId userId
+     */
+    void deleteCartChecked(Long userId);
 }

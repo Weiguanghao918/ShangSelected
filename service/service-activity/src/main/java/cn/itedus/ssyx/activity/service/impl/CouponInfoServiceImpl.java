@@ -6,8 +6,10 @@ import cn.itedus.ssyx.activity.mapper.CouponUserMapper;
 import cn.itedus.ssyx.activity.service.CouponInfoService;
 import cn.itedus.ssyx.client.product.ProductFeignClient;
 import cn.itedus.ssyx.enums.CouponRangeType;
+import cn.itedus.ssyx.enums.CouponStatus;
 import cn.itedus.ssyx.model.activity.CouponInfo;
 import cn.itedus.ssyx.model.activity.CouponRange;
+import cn.itedus.ssyx.model.activity.CouponUse;
 import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.model.product.Category;
 import cn.itedus.ssyx.model.product.SkuInfo;
@@ -206,6 +208,32 @@ public class CouponInfoServiceImpl extends ServiceImpl<CouponInfoMapper, CouponI
         }
 
         return couponIdToSkuIdMap;
+    }
+
+    @Override
+    public CouponInfo findRangeSkuIdList(List<CartInfo> cartInfoList, Long couponId) {
+        CouponInfo couponInfo = couponInfoMapper.selectById(couponId);
+        List<CouponRange> couponRangeList = couponRangeMapper.selectList(new LambdaQueryWrapper<CouponRange>().eq(CouponRange::getCouponId, couponId));
+        Map<Long, List<Long>> couponIdToSkuIdMap = this.findCouponIdToSkuIdMap(cartInfoList, couponRangeList);
+
+        List<Long> skuIdList = couponIdToSkuIdMap.entrySet().iterator().next().getValue();
+
+        couponInfo.setSkuIdList(skuIdList);
+
+        return couponInfo;
+    }
+
+    @Override
+    public void updateCouponInfoUseStatus(Long couponId, Long userId, Long orderId) {
+        CouponUse couponUse = new CouponUse();
+        couponUse.setOrderId(orderId);
+        couponUse.setCouponStatus(CouponStatus.USED);
+        couponUse.setUsingTime(new Date());
+
+        QueryWrapper<CouponUse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("coupon_id", couponId);
+        queryWrapper.eq("user_id", userId);
+        couponUserMapper.update(couponUse, queryWrapper);
     }
 
     private BigDecimal computeTotalAmount(List<CartInfo> cartInfoList) {

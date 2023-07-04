@@ -282,7 +282,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
         //一旦有一个库存锁定失败，那么所有的锁定成功的商品都要解锁库存
         boolean flag = skuStockLockVoList.stream().anyMatch(skuStockLockVo -> !skuStockLockVo.getIsLock());
-        if (!flag) {
+        if (flag) {
             //所有锁定商品需要进行解锁
             skuStockLockVoList.stream().filter(skuStockLockVo -> skuStockLockVo.getIsLock()).forEach(skuStockLockVo -> {
                 skuInfoMapper.unlockStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());

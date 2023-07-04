@@ -24,6 +24,19 @@ spring:
         max-wait: -1
         max-idle: 5
         min-idle: 0
+  rabbitmq:
+    host: 192.168.10.101
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirm-type: CORRELATED
+    publisher-returns: true
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 3
+        acknowledge-mode: manual
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8

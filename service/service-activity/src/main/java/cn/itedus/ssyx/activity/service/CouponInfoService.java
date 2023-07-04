@@ -83,4 +83,23 @@ public interface CouponInfoService extends IService<CouponInfo> {
      * @return
      */
     Map<Long, List<Long>> findCouponIdToSkuIdMap(List<CartInfo> cartInfoList, List<CouponRange> couponRangeList);
+
+
+    /**
+     * 封装优惠券信息，将优惠券设计的商品ID进行封装
+     *
+     * @param cartInfoList 商品集合
+     * @param couponId     优惠券Id
+     * @return 封装类
+     */
+    CouponInfo findRangeSkuIdList(List<CartInfo> cartInfoList, Long couponId);
+
+    /**
+     * 更新优惠券使用状态
+     *
+     * @param couponId 优惠券ID
+     * @param userId   用户ID
+     * @param orderId  订单ID
+     */
+    void updateCouponInfoUseStatus(Long couponId, Long userId, Long orderId);
 }

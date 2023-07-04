@@ -1,17 +1,11 @@
 package cn.itedus.ssyx.activity.service.impl;
 
-import cn.itedus.ssyx.activity.mapper.ActivityInfoMapper;
-import cn.itedus.ssyx.activity.mapper.ActivityRuleMapper;
-import cn.itedus.ssyx.activity.mapper.ActivitySkuMapper;
-import cn.itedus.ssyx.activity.mapper.CouponInfoMapper;
+import cn.itedus.ssyx.activity.mapper.*;
 import cn.itedus.ssyx.activity.service.ActivityInfoService;
 import cn.itedus.ssyx.activity.service.CouponInfoService;
 import cn.itedus.ssyx.client.product.ProductFeignClient;
 import cn.itedus.ssyx.enums.ActivityType;
-import cn.itedus.ssyx.model.activity.ActivityInfo;
-import cn.itedus.ssyx.model.activity.ActivityRule;
-import cn.itedus.ssyx.model.activity.ActivitySku;
-import cn.itedus.ssyx.model.activity.CouponInfo;
+import cn.itedus.ssyx.model.activity.*;
 import cn.itedus.ssyx.model.order.CartInfo;
 import cn.itedus.ssyx.model.product.SkuInfo;
 import cn.itedus.ssyx.vo.activity.ActivityRuleVo;
@@ -48,6 +42,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     private ProductFeignClient productFeignClient;
     @Autowired
     private CouponInfoService couponInfoService;
+
 
 
     @Override
@@ -182,6 +177,8 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         }
         return cartInfoVoList;
     }
+
+
 
 
     /**
