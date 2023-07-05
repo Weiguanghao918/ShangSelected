@@ -1,0 +1,63 @@
+server:
+  port: 8210
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-enums-package: cn.itedus.ssyx.enums
+  mapper-locations: classpath:mapper/*.xml
+feign:
+  sentinel:
+    enabled: true
+  client:
+    config:
+      default:   #配置全局的feign的调用超时时间  如果 有指定的服务配置 默认的配置不会生效
+        connectTimeout: 30000 # 指定的是 消费者 连接服务提供者的连接超时时间 是否能连接  单位是毫秒
+        readTimeout: 50000  # 指定的是调用服务提供者的 服务 的超时时间（）  单位是毫秒
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq:
+    host: 192.168.10.100
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 3
+        acknowledge-mode: manual
+
+  redis:
+    host: 192.168.10.101
+    port: 6379
+    database: 0
+    password: 111111
+    lettuce:
+      pool:
+        max-idle: 20
+        max-wait: -1
+        max-active: 5
+        min-idle: 0
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/shequ-order?characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 980918
+    hikari:
+      connection-test-query: SELECT 1
+      connection-timeout: 60000
+      idle-timeout: 500000
+      max-lifetime: 540000
+      maximum-pool-size: 5
+      minimum-idle: 3
+      pool-name: GuliHikariPool
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+

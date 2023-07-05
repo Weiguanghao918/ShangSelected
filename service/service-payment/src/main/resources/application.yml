@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: service-payment
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8850
+  profiles:
+    active: dev
