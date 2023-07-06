@@ -38,4 +38,12 @@ public interface SkuInfoMapper extends BaseMapper<SkuInfo> {
      * @return 影响行数
      */
     Integer lockStock(@Param("skuId") Long skuId, @Param("skuNum") Integer skuNum);
+
+    /**
+     * 扣减库存
+     *
+     * @param skuId  skuId
+     * @param skuNum SKu数量
+     */
+    void minusStock(@Param("skuId") Long skuId, @Param("skuNum") Integer skuNum);
 }

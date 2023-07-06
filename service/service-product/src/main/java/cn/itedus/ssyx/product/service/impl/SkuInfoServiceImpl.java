@@ -26,11 +26,13 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -57,6 +59,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
 
     @Autowired
     private RedissonClient redissonClient;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Override
     public IPage<SkuInfo> selectPageInfo(Page<SkuInfo> pageParam, SkuInfoQueryVo skuInfoQueryVo) {
@@ -290,8 +295,24 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> impl
             //相应锁定状态
             return false;
         }
+
+        redisTemplate.opsForValue().set(RedisConst.SROCK_INFO + orderNo, skuStockLockVoList);
+
         return true;
 
+    }
+
+    @Override
+    public void minusStock(String orderNo) {
+        List<SkuStockLockVo> skuStockLockVoList = (List<SkuStockLockVo>) this.redisTemplate.opsForValue().get(RedisConst.SROCK_INFO + orderNo);
+        if (CollectionUtils.isEmpty(skuStockLockVoList)) {
+            return;
+        }
+        skuStockLockVoList.forEach(skuStockLockVo -> {
+            skuInfoMapper.minusStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());
+        });
+
+        this.redisTemplate.delete(RedisConst.SROCK_INFO + orderNo);
     }
 
     private void checkLock(SkuStockLockVo skuStockLockVo) {

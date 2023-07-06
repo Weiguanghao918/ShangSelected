@@ -67,20 +67,24 @@ public class Result<T> {
         return result;
     }
 
+
+
     /**
      * 失败的结果集返回
      *
-     * @param data 数据
-     * @param <T>  泛型
+     * @param <T>          泛型
+     * @param data         数据
+     * @param paymentError
      * @return 结果集
      */
-    public static <T> Result<T> fail(T data) {
+    public static <T> Result<T> fail(T data, ResultCodeEnum paymentError) {
         return build(data, ResultCodeEnum.FAIL);
     }
 
     public static <T> Result<T> fail() {
         return build(null, ResultCodeEnum.FAIL);
     }
+
 
 
 }

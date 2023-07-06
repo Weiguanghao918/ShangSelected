@@ -6,8 +6,12 @@ import cn.itedus.ssyx.model.order.OrderInfo;
 import cn.itedus.ssyx.order.service.OrderInfoService;
 import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import cn.itedus.ssyx.vo.order.OrderSubmitVo;
+import cn.itedus.ssyx.vo.order.OrderUserQueryVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +49,24 @@ public class OrderApiController {
     public Result getOrderInfoById(@PathVariable("orderId") Long orderId) {
         OrderInfo orderInfo = orderInfoService.getOrderInfoById(orderId);
         return Result.ok(orderInfo);
+    }
+
+    @ApiOperation("根据订单编号获取订单项")
+    @GetMapping("inner/getOrderInfoByOrderNo/{orderNo}")
+    public OrderInfo getOrderInfoByOrderNo(@PathVariable("orderNo") String orderNo) {
+        return orderInfoService.getOrderInfoByOrderNo(orderNo);
+    }
+
+    @ApiOperation("获取用户订单分页列表")
+    @GetMapping("auth/findUserOrderPage/{page}/{limit}")
+    public Result findUserOrderPage(@PathVariable("page") Long page,
+                                    @PathVariable("limit") Long limit,
+                                    OrderUserQueryVo orderUserQueryVo) {
+        Long userId = AuthContextHolder.getUserId();
+        orderUserQueryVo.setUserId(userId);
+        Page<OrderInfo> pageModel = new Page<>(page, limit);
+        IPage<OrderInfo> iPage = orderInfoService.findUserOrderPage(pageModel, orderUserQueryVo);
+        return Result.ok(iPage);
     }
 
 }

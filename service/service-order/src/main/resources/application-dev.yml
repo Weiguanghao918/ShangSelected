@@ -21,6 +21,13 @@ spring:
     port: 5672
     username: guest
     password: guest
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 3
+        acknowledge-mode: manual
+    publisher-confirm-type: correlated
+    publisher-returns: true
   redis:
     host: 192.168.10.101
     port: 6379

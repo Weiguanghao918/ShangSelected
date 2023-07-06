@@ -23,9 +23,12 @@ import cn.itedus.ssyx.order.service.OrderItemService;
 import cn.itedus.ssyx.vo.order.CartInfoVo;
 import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import cn.itedus.ssyx.vo.order.OrderSubmitVo;
+import cn.itedus.ssyx.vo.order.OrderUserQueryVo;
 import cn.itedus.ssyx.vo.product.SkuStockLockVo;
 import cn.itedus.ssyx.vo.user.LeaderAddressVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jodd.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +76,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Autowired
     private RabbitService rabbitService;
+
+
 
 
     @Override
@@ -258,18 +263,6 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             activityFeignClient.updateCouponInfoUseStatus(order.getCouponId(), userId, order.getId());
         }
 
-        //下单成功，记录用户商品购买个数
-        String orderSkuKey = RedisConst.ORDER_SKU_MAP + orderSubmitVo.getUserId();
-        BoundHashOperations<String, String, Integer> hashOperations = redisTemplate.boundHashOps(orderSkuKey);
-        cartInfoList.forEach(cartInfo -> {
-            if (hashOperations.hasKey(cartInfo.getSkuId().toString())) {
-                Integer orderSkuNum = hashOperations.get(cartInfo.getSkuId().toString()) + cartInfo.getSkuNum();
-                hashOperations.put(cartInfo.getSkuId().toString(), orderSkuNum);
-            } else {
-                hashOperations.put(cartInfo.getSkuId().toString(), cartInfo.getSkuNum());
-            }
-        });
-        redisTemplate.expire(orderSkuKey, DateUtil.getCurrentExpireTimes(), TimeUnit.SECONDS);
 
         //发送消息
         return order.getId();
@@ -284,6 +277,50 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         List<OrderItem> orderItemList = orderItemService.list(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderInfo.getId()));
         orderInfo.setOrderItemList(orderItemList);
         return orderInfo;
+    }
+
+    @Override
+    public OrderInfo getOrderInfoByOrderNo(String orderNo) {
+        return orderInfoMapper.selectOne(new LambdaQueryWrapper<OrderInfo>().eq(OrderInfo::getOrderNo, orderNo));
+    }
+
+    @Override
+    public void orderPay(String orderNo) {
+        OrderInfo orderInfo = this.getOrderInfoByOrderNo(orderNo);
+        if (null == orderInfo || orderInfo.getOrderStatus() != OrderStatus.UNPAID) {
+            return;
+        }
+        this.updateOrderStatus(orderInfo.getId(), ProcessStatus.WAITING_DELEVER);
+
+        rabbitService.sendMessage(MqConst.EXCHANGE_ORDER_DIRECT, MqConst.ROUTING_MINUS_STOCK, orderNo);
+    }
+
+    @Override
+    public IPage<OrderInfo> findUserOrderPage(Page<OrderInfo> pageModel, OrderUserQueryVo orderUserQueryVo) {
+
+        IPage<OrderInfo> pageResult = orderInfoMapper.selectPage(pageModel, new LambdaQueryWrapper<OrderInfo>().eq(OrderInfo::getUserId, orderUserQueryVo.getUserId()).eq(OrderInfo::getOrderStatus, orderUserQueryVo.getOrderStatus()));
+        List<OrderInfo> orderInfoList = pageResult.getRecords();
+        for (OrderInfo orderInfo : orderInfoList) {
+            List<OrderItem> orderItemList = orderItemService.list(new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, orderInfo.getId()));
+            orderInfo.setOrderItemList(orderItemList);
+            orderInfo.getParam().put("orderStatusName",orderInfo.getOrderStatus().getComment());
+        }
+        return pageModel;
+    }
+
+    private void updateOrderStatus(Long orderId, ProcessStatus processStatus) {
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setId(orderId);
+        orderInfo.setProcessStatus(processStatus);
+        orderInfo.setOrderStatus(processStatus.getOrderStatus());
+        if (processStatus == ProcessStatus.WAITING_DELEVER) {
+            orderInfo.setPaymentTime(new Date());
+        } else if (processStatus == ProcessStatus.WAITING_LEADER_TAKE) {
+            orderInfo.setDeliveryTime(new Date());
+        } else if (processStatus == ProcessStatus.WAITING_USER_TAKE) {
+            orderInfo.setTakeTime(new Date());
+        }
+        orderInfoMapper.updateById(orderInfo);
     }
 
 

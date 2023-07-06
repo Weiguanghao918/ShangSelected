@@ -116,4 +116,11 @@ public interface SkuInfoService extends IService<SkuInfo> {
      * @return 是否成功
      */
     Boolean checkAndLock(List<SkuStockLockVo> skuStockLockVoList, String orderNo);
+
+    /**
+     * 支付成功后，扣减库存操作
+     *
+     * @param orderNo 订单编号
+     */
+    void minusStock(String orderNo);
 }

@@ -27,6 +27,10 @@ public enum ResultCodeEnum {
     COUPON_GET(220, "优惠券已经领取"),
     COUPON_LIMIT_GET(221, "优惠券已发放完毕"),
 
+    PAYMENT_ERROR(255, "支付出错"),
+    PAYMENT_SUCCESS(256,"支付成功"),
+    PAYMENT_DOING(257,"支付中"),
+
     URL_ENCODE_ERROR(216, "URL编码失败"),
     ILLEGAL_CALLBACK_REQUEST_ERROR(217, "非法回调请求"),
     FETCH_ACCESSTOKEN_FAILD(218, "获取accessToken失败"),

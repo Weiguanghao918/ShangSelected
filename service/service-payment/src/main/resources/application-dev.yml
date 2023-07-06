@@ -19,7 +19,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   rabbitmq:
-    host: 192.168.10.100
+    host: 192.168.10.101
     port: 5672
     username: guest
     password: guest
@@ -61,3 +61,11 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 
+# 微信
+weixin:
+  #小程序微信公众平台appId
+  appid: wxcc651fcbab275e33
+  partner: 1481962542
+  partnerkey: MXb72b9RfshXZD4FRGV5KLqmv5bx9LT9
+  notifyurl: http://gmall-prod.atguigu.cn/api/payment/weixin/notify
+  cert: D:\yygh_work\yygh_parent\service\service-order\src\main\resources\apiclient_cert.p12

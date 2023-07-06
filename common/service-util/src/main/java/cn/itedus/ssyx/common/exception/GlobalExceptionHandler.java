@@ -1,6 +1,7 @@
 package cn.itedus.ssyx.common.exception;
 
 import cn.itedus.ssyx.common.result.Result;
+import cn.itedus.ssyx.common.result.ResultCodeEnum;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,7 +17,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result error(Exception e) {
         e.printStackTrace();
-        return Result.fail(null);
+        return Result.fail(null, ResultCodeEnum.PAYMENT_ERROR);
     }
 
     /**

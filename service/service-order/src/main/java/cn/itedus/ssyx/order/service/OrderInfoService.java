@@ -3,6 +3,9 @@ package cn.itedus.ssyx.order.service;
 import cn.itedus.ssyx.model.order.OrderInfo;
 import cn.itedus.ssyx.vo.order.OrderConfirmVo;
 import cn.itedus.ssyx.vo.order.OrderSubmitVo;
+import cn.itedus.ssyx.vo.order.OrderUserQueryVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -33,4 +36,28 @@ public interface OrderInfoService extends IService<OrderInfo> {
      * @return 订单详情项
      */
     OrderInfo getOrderInfoById(Long orderId);
+
+    /**
+     * 根据订单编号获取订单项
+     *
+     * @param orderNo 订单编号
+     * @return 订单项
+     */
+    OrderInfo getOrderInfoByOrderNo(String orderNo);
+
+    /**
+     * 更新订单状态，支付成功后
+     *
+     * @param orderNo 订单编号
+     */
+    void orderPay(String orderNo);
+
+    /**
+     * 分页查询用户订单信息
+     *
+     * @param pageModel        分页信息
+     * @param orderUserQueryVo 查询对象
+     * @return 分页数据
+     */
+    IPage<OrderInfo> findUserOrderPage(Page<OrderInfo> pageModel, OrderUserQueryVo orderUserQueryVo);
 }
