@@ -56,8 +56,8 @@ public class WeixinServiceImpl implements WeixinService {
         paramMap.put("spbill_create_ip", "127.0.0.1");
         paramMap.put("notify_url", ConstantPropertiesUtils.NOTIFYURL);
         paramMap.put("trade_type", "JSAPI");
-//			paramMap.put("openid", "o1R-t5trto9c5sdYt6l1ncGmY5iY");
-        UserLoginVo userLoginVo = (UserLoginVo)redisTemplate.opsForValue().get("user:login:" + paymentInfo.getUserId());
+
+        UserLoginVo userLoginVo = (UserLoginVo) redisTemplate.opsForValue().get(RedisConst.USER_LOGIN_KEY_PREFIX + paymentInfo.getUserId());
         if(null != userLoginVo && !StringUtils.isEmpty(userLoginVo.getOpenId())) {
             paramMap.put("openid", userLoginVo.getOpenId());
         } else {
